@@ -1,0 +1,28 @@
+{
+  "name": "web-scrapper",
+  "version": "1.0.0",
+  "description": "\"# Web-scrapper\"",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Anugrah-T-Sebastian/Web-scrapper.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Anugrah-T-Sebastian/Web-scrapper/issues"
+  },
+  "homepage": "https://github.com/Anugrah-T-Sebastian/Web-scrapper#readme",
+  "dependencies": {
+    "axios": "^1.2.0",
+    "cheerio": "^1.0.0-rc.12",
+    "json2csv": "^5.0.7",
+    "pretty": "^2.0.0",
+    "puppeteer": "^19.3.0",
+    "request": "^2.88.2"
+  }
+}
