@@ -21,8 +21,9 @@
     "axios": "^1.2.0",
     "cheerio": "^1.0.0-rc.12",
     "json2csv": "^5.0.7",
+    "osmosis": "^1.1.10",
     "pretty": "^2.0.0",
-    "puppeteer": "^19.3.0",
+    "puppeteer": "^19.4.0",
     "request": "^2.88.2"
   }
 }
