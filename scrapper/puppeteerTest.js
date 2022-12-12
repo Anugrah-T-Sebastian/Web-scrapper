@@ -4,18 +4,71 @@ const { Parser } = require("json2csv");
 
 const urlSearchResults =
   "https://publicaccess.glasgow.gov.uk/online-applications/simpleSearchResults.do?action=firstPage";
-const urlSearchPage =
-  "https://publicaccess.glasgow.gov.uk/online-applications/search.do?action=simple&searchType=Application";
 
-const getSiteData = async (url) => {
+const councils = [
+  {
+    councilURL:
+      "https://publicaccess.glasgow.gov.uk/online-applications/search.do?action=simple&searchType=Application",
+    councilName: "Glasgow",
+  },
+  {
+    councilURL:
+      "https://publicaccess.aberdeencity.gov.uk/online-applications/search.do?action=simple&searchType=Application",
+    councilName: "Aberdeencity",
+  },
+  {
+    councilURL:
+      "https://citydev-portal.edinburgh.gov.uk/idoxpa-web/search.do?action=simple&searchType=Application",
+    councilName: "Edinburgh",
+  },
+  {
+    councilURL:
+      "https://planningandwarrant.orkney.gov.uk/online-applications/search.do?action=simple&searchType=Application",
+    councilName: "Orkney",
+  },
+  {
+    councilURL:
+      "https://pa.shetland.gov.uk/online-applications/search.do?action=simple&searchType=Application",
+    councilName: "Shetland",
+  },
+  {
+    councilURL:
+      "  https://planning.cne-siar.gov.uk/PublicAccess/search.do?action=simple&searchType=Application",
+    councilName: "Siar",
+  },
+  {
+    councilURL:
+      "https://eplanning.east-ayrshire.gov.uk/online/search.do?action=simple&searchType=Application",
+    councilName: "East Ayrshire",
+  },
+  {
+    councilURL:
+      "https://publicaccess.southlanarkshire.gov.uk/online-applications/search.do?action=simple&searchType=Application",
+    councilName: "Southl Anarkshire",
+  },
+  {
+    councilURL:
+      "https://planning.eastdunbarton.gov.uk/online-applications/search.do?action=simple&searchType=Application",
+    councilName: "East Dunbarton Shire",
+  },
+];
+
+const getSiteData = async (councilURL, councilName) => {
   console.log("->START");
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
-  await page.goto(url);
+  await page.goto(councilURL);
 
   // SCREENSHOT THE PAGE
   const timeStamp = +new Date();
   console.log("TIME:", timeStamp);
+  // -- try creating the start-pages folder
+  try {
+    await fs.mkdir("../screenshots/start-pages");
+  } catch (error) {
+    console.error("Folder exists");
+  }
+  // -- try saving screenshot
   await page.screenshot({
     path: `../screenshots/start-pages/startPages${timeStamp}.png`,
   });
@@ -33,6 +86,13 @@ const getSiteData = async (url) => {
     ]);
     const timeStamp2 = +new Date();
     console.log("Search TIME:", timeStamp2);
+    // -- create search-pages folder
+    try {
+      await fs.mkdir("../screenshots/search-pages");
+    } catch (error) {
+      console.error("Folder exists");
+    }
+    // -- try saving screenshot
     await page.screenshot({
       path: `../screenshots/search-pages/searchResults${timeStamp2}.png`,
     });
@@ -65,7 +125,7 @@ const getSiteData = async (url) => {
     searchPageLinks.push(`${urlFist}&${urlSecond}=${i}`);
     i++;
   }
-  console.log("--TEST:", searchPageLinks, searchResultsCount);
+  console.log("--Search page results:", searchPageLinks, searchResultsCount);
 
   // MAIN!!: SCRAPPING DATA
   let finalData = [];
@@ -90,7 +150,7 @@ const getSiteData = async (url) => {
       await page.goto(appLink);
 
       // -- get data from table
-      const row = await page.evaluate(() => {
+      let row = await page.evaluate(() => {
         const rowElements = document.querySelectorAll(
           "#simpleDetailsTable  tbody  tr"
         );
@@ -105,6 +165,8 @@ const getSiteData = async (url) => {
         return rowData;
       });
 
+      row["Application Link"] = appLink;
+      row["Council"] = councilName;
       data.push(row);
     }
     finalData.push(...data);
@@ -114,16 +176,33 @@ const getSiteData = async (url) => {
   console.log(`->SCRAPPING COMPLETED at ${+new Date()}!!`);
 
   // CREATE CSV FILE
-  convertToCVS(finalData);
+  convertToCVS(finalData, councilName);
 };
 
-const convertToCVS = async (jsonObj) => {
+const convertToCVS = async (jsonObj, councilName) => {
   console.log(`->Writing CVS`);
   const parserObj = new Parser();
   const csv = parserObj.parse(jsonObj);
 
-  await fs.writeFile(`../csv-files/date${+new Date()}.csv`, csv);
-  console.log(`->CVS WRITTEN & SAVED ${+new Date()}`);
+  // -- create csv folder
+  try {
+    await fs.mkdir("../csv-files");
+  } catch (error) {
+    console.error("Folder exists");
+  }
+
+  await fs.writeFile(`../csv-files/${councilName}:${+new Date()}.csv`, csv);
+  console.log(`->CVS WRITTEN & SAVED for ${councilName} at ${+new Date()}`);
 };
 
-getSiteData(urlSearchPage);
+//getSiteData(councils[2].councilURL, councils[2].councilName);
+
+const createFolder = async () => {
+  try {
+    await fs.mkdir("../screenshots/test-folder");
+  } catch (error) {
+    console.error("Folder exists");
+  }
+};
+
+createFolder();
