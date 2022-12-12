@@ -195,14 +195,4 @@ const convertToCVS = async (jsonObj, councilName) => {
   console.log(`->CVS WRITTEN & SAVED for ${councilName} at ${+new Date()}`);
 };
 
-//getSiteData(councils[2].councilURL, councils[2].councilName);
-
-const createFolder = async () => {
-  try {
-    await fs.mkdir("../screenshots/test-folder");
-  } catch (error) {
-    console.error("Folder exists");
-  }
-};
-
-createFolder();
+getSiteData(councils[2].councilURL, councils[2].councilName);
